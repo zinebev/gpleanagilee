@@ -1,33 +1,41 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from django.contrib import messages
+from django.contrib.auth import authenticate
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def register_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Ce nom utilisateur existe déjà')
-        else:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            login(request, user)
-            return redirect('dashboard')
-    return render(request, 'accounts/register.html')
+    username = request.data.get('username')
+    email = request.data.get('email')
+    password = request.data.get('password')
 
+    if User.objects.filter(username=username).exists():
+        return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = User.objects.create_user(username=username, email=email, password=password)
+    refresh = RefreshToken.for_user(user)
+
+    return Response({
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            return redirect('dashboard')
-        else:
-            messages.error(request, 'Identifiants incorrects')
-    return render(request, 'accounts/login.html')
+    username = request.data.get('username')
+    password = request.data.get('password')
 
-def logout_view(request):
-    logout(request)
-    return redirect('login')
+    user = authenticate(username=username, password=password)
+    if user is None:
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    refresh = RefreshToken.for_user(user)
+    return Response({
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    })
