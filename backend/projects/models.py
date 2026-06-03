@@ -34,6 +34,7 @@ class Tache(models.Model):
     date_fin = models.DateField()
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='todo')
     priorite = models.IntegerField(default=1)
+    date_creation = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.titre

@@ -1,0 +1,68 @@
+{
+  "version": "1.0",
+  "maintainer": "Zineb",
+  "updated_at": "2026-06-01",
+  "base_url": "http://localhost:8000/api",
+  "auth": {
+    "type": "JWT via Cookie (js-cookie)",
+    "cookie_name": "token",
+    "header": "Authorization: Bearer <token>"
+  },
+  "endpoints": {
+    "auth": {
+      "POST /login/":    { "auth_required": false, "body": { "username": "string", "password": "string" }, "returns": { "access": "string" }},
+      "POST /register/": { "auth_required": false, "body": { "username": "string", "email": "string", "password": "string" }, "returns": { "access": "string" }}
+    },
+    "projects": {
+      "GET /projects/":         { "auth_required": true, "returns": "[Project]" },
+      "POST /projects/":        { "auth_required": true, "body": { "name": "string", "description": "string", "start_date": "YYYY-MM-DD", "end_date": "YYYY-MM-DD", "budget": "number", "quality_target": "number" }},
+      "GET /projects/{id}/":    { "auth_required": true, "returns": "Project" },
+      "PUT /projects/{id}/":    { "auth_required": true },
+      "DELETE /projects/{id}/": { "auth_required": true }
+    },
+    "budget": {
+      "GET /projects/{id}/budget/":          { "auth_required": true },
+      "POST /projects/{id}/budget/expense/": { "auth_required": true, "body": { "amount": "number", "description": "string" }}
+    },
+    "lean": {
+      "GET /projects/{id}/wastes/":  { "auth_required": true },
+      "POST /projects/{id}/wastes/": { "auth_required": true },
+      "GET /projects/{id}/vsm/":     { "auth_required": true },
+      "POST /projects/{id}/vsm/":    { "auth_required": true },
+      "GET /projects/{id}/kaizen/":  { "auth_required": true },
+      "POST /projects/{id}/kaizen/": { "auth_required": true }
+    },
+    "quality": {
+      "GET /projects/{id}/non-conformities/":    { "auth_required": true },
+      "POST /projects/{id}/non-conformities/":   { "auth_required": true },
+      "GET /projects/{id}/corrective-actions/":  { "auth_required": true },
+      "POST /projects/{id}/corrective-actions/": { "auth_required": true },
+      "GET /projects/{id}/quality-kpi/":         { "auth_required": true }
+    },
+    "agile": {
+      "GET /projects/{id}/sprints/":    { "auth_required": true },
+      "POST /projects/{id}/sprints/":   { "auth_required": true },
+      "GET /tasks/":                    { "auth_required": true },
+      "POST /tasks/":                   { "auth_required": true },
+      "PUT /tasks/{id}/move/":          { "auth_required": true, "body": { "status": "todo | in_progress | done" }}
+    }
+  },
+  "status_tracker": {
+    "POST /login/":                        { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" },
+    "POST /register/":                     { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" },
+    "GET /projects/":                      { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" },
+    "POST /projects/":                     { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" },
+    "GET /projects/{id}/":                 { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" },
+    "GET /projects/{id}/budget/":          { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" },
+    "POST /projects/{id}/budget/expense/": { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" },
+    "GET /projects/{id}/wastes/":          { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" },
+    "POST /projects/{id}/wastes/":         { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" },
+    "GET /projects/{id}/sprints/":         { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" },
+    "PUT /tasks/{id}/move/":               { "backend": "⬜", "frontend": "✅", "integrated": "⬜", "tested": "⬜" }
+  },
+  "notes": {
+    "login_endpoint": "Hajar utilise /login/ (pas /token/) — Douae doit confirmer que Django retourne bien { access: string }",
+    "cookies": "Le token est stocké dans un cookie 'token' via js-cookie ET dans localStorage",
+    "missing_backend": "Les apps projects/, lean/, agile/, quality/ n'ont pas encore leurs urls.py inclus dans gpleanagile/urls.py"
+  }
+}

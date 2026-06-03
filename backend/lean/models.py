@@ -1,35 +1,50 @@
-from django.db import models
+﻿from django.db import models
 from projects.models import Projet
+
 
 class Muda(models.Model):
     TYPE_CHOICES = [
-        ('surproduction', 'Surproduction'),
-        ('attente', 'Attente'),
-        ('transport', 'Transport'),
-        ('surtraitement', 'Surtraitement'),
-        ('stock', 'Stock excessif'),
-        ('mouvement', 'Mouvement inutile'),
-        ('defaut', 'Défaut'),
+        ("surproduction", "Surproduction"),
+        ("attente", "Attente"),
+        ("transport", "Transport"),
+        ("stock", "Stock"),
+        ("mouvement", "Mouvement"),
+        ("defaut", "Defaut"),
+        ("surtraitement", "Surtraitement"),
     ]
-    projet = models.ForeignKey(Projet, on_delete=models.CASCADE)
-    type_muda = models.CharField(max_length=50, choices=TYPE_CHOICES)
-    description = models.TextField()
-    impact = models.CharField(max_length=200)
-    date = models.DateField(auto_now_add=True)
+    projet = models.ForeignKey(Projet, on_delete=models.CASCADE, related_name="mudas")
+    type_gaspillage = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    description = models.TextField(blank=True)
+    impact = models.CharField(max_length=200, blank=True)
+    date_creation = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.type_muda} - {self.projet.nom}"
+        return f"{self.type_gaspillage} - {self.projet.nom}"
+
 
 class Kaizen(models.Model):
-    projet = models.ForeignKey(Projet, on_delete=models.CASCADE)
+    STATUT_CHOICES = [
+        ("propose", "Propose"),
+        ("en_cours", "En cours"),
+        ("realise", "Realise"),
+    ]
+    projet = models.ForeignKey(Projet, on_delete=models.CASCADE, related_name="kaizens")
     titre = models.CharField(max_length=200)
-    description = models.TextField()
-    statut = models.CharField(max_length=50, choices=[
-        ('planifie', 'Planifié'),
-        ('en_cours', 'En cours'),
-        ('termine', 'Terminé'),
-    ], default='planifie')
-    date_creation = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True)
+    gain_estime = models.CharField(max_length=200, blank=True)
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default="propose")
+    date_creation = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.titre
+
+
+class VSMStep(models.Model):
+    projet = models.ForeignKey(Projet, on_delete=models.CASCADE, related_name="vsm_steps")
+    nom = models.CharField(max_length=200)
+    temps_valeur = models.IntegerField(default=0)
+    temps_attente = models.IntegerField(default=0)
+    ordre = models.IntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.nom} - {self.projet.nom}"

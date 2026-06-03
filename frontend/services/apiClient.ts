@@ -1,87 +1,54 @@
-const BASE_URL =
-  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) ||
-  "http://localhost:8000/api";
+// frontend/services/apiClient.ts
+// Zineb - Jour 1
+// Compatible avec lib/api.ts de Hajar (js-cookie)
 
-async function request<T>(
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+
+function getToken(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/(?:^|;\s*)token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+export async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit = {}
+  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE" = "GET",
+  body?: unknown
 ): Promise<T> {
-  const token =
-    typeof globalThis.window !== "undefined"
-      ? globalThis.window.localStorage.getItem("access_token")
-      : null;
+  const token = getToken();
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
-  if (res.status === 401) {
-    const refreshed = await tryRefreshToken();
-    if (refreshed) {
-      const newToken = globalThis.window.localStorage.getItem("access_token");
-      const retryRes = await fetch(`${BASE_URL}${endpoint}`, {
-        ...options,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${newToken}`,
-        },
-      });
-      if (!retryRes.ok) throw new Error("Non autorisé");
-      return retryRes.json();
-    }
-    globalThis.window.localStorage.clear();
-    globalThis.window.location.href = "/login";
-    throw new Error("Session expirée");
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    method,
+    headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+
+  if (response.status === 204) return {} as T;
+
+  const data = await response.json();
+
+  if (!response.ok) {
     throw new Error(
-      (err as Record<string, string>).detail ||
-      (err as Record<string, string>).error ||
-      `Erreur ${res.status}`
+      data.detail || data.error || `Erreur ${response.status}`
     );
   }
 
-  if (res.status === 204) return {} as T;
-  return res.json();
+  return data as T;
 }
 
-async function tryRefreshToken(): Promise<boolean> {
-  const refresh =
-    typeof globalThis.window !== "undefined"
-      ? globalThis.window.localStorage.getItem("refresh_token")
-      : null;
-  if (!refresh) return false;
-
-  try {
-    const res = await fetch(`${BASE_URL}/token/refresh/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh }),
-    });
-    if (!res.ok) return false;
-    const data = await res.json() as { access: string };
-    globalThis.window.localStorage.setItem("access_token", data.access);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export const api = {
-  get: <T>(url: string) => request<T>(url),
-  post: <T>(url: string, body: unknown) =>
-    request<T>(url, { method: "POST", body: JSON.stringify(body) }),
-  put: <T>(url: string, body: unknown) =>
-    request<T>(url, { method: "PUT", body: JSON.stringify(body) }),
-  patch: <T>(url: string, body: unknown) =>
-    request<T>(url, { method: "PATCH", body: JSON.stringify(body) }),
-  delete: <T>(url: string) => request<T>(url, { method: "DELETE" }),
+export const apiClient = {
+  get:    <T>(url: string)                  => apiRequest<T>(url, "GET"),
+  post:   <T>(url: string, body: unknown)   => apiRequest<T>(url, "POST", body),
+  put:    <T>(url: string, body: unknown)   => apiRequest<T>(url, "PUT", body),
+  patch:  <T>(url: string, body: unknown)   => apiRequest<T>(url, "PATCH", body),
+  delete: <T>(url: string)                  => apiRequest<T>(url, "DELETE"),
 };

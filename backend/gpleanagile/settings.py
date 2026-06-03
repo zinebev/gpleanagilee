@@ -1,4 +1,10 @@
 from pathlib import Path
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=12),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -18,6 +24,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'account',
+    'projects',
+    'agile',
+    'lean',
 ]
 
 MIDDLEWARE = [

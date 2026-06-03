@@ -4,10 +4,22 @@ from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Sum
+from django.contrib.auth.models import User
+from rest_framework import serializers as drf_serializers
 from .models import Projet, Tache, Cout, NonConformite
 from .serializers import ProjetSerializer, TacheSerializer, CoutSerializer, NonConformiteSerializer
 
+class UserMiniSerializer(drf_serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
 
+
+class UserListViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserMiniSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
 class ProjetViewSet(viewsets.ModelViewSet):
     serializer_class = ProjetSerializer
     permission_classes = [permissions.IsAuthenticated]
