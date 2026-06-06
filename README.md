@@ -1,118 +1,100 @@
-﻿# GPLeanAgile
+﻿# GPLeanAgile 🚀
 
-A web platform for managing projects with a combined Lean and Agile approach, built for industrial, logistics, and supply chain contexts. Academic project developed in the Supply Chain & Logistics program at ENSIAS.
+> Système de Gestion de Projets basé sur les Méthodologies Lean et Agile
 
-## Overview
+---
 
-GPLeanAgile digitizes a Lean-Agile project management framework to help teams manage projects from start to delivery, standardize practices, track cost/schedule/quality performance, and support project-manager decisions.
+## 📋 Description
 
-## Features
+**GPLeanAgile** est une application web complète de gestion de projets développée dans le cadre du Projet de Fin d'Année à l'ENSIAS (filière 2SCL). Elle intègre les meilleures pratiques des méthodologies **Lean** et **Agile** pour permettre aux équipes de piloter efficacement leurs projets.
 
-### Project management
-- Create and configure projects
-- Set objectives for cost, quality, and schedule
-- Manage multiple projects from a central dashboard
+---
 
-### Agile module
-- Product backlog with prioritization
-- Sprint tracking with progress indicators
-- Kanban board with drag-and-drop (To do, In progress, Done)
-- Task assignment, creation timestamps, and status colors
+## 👥 Équipe
 
-### Lean module
-- Waste identification (Muda) across the seven waste types
-- Value Stream Mapping (VSM) with value vs wait time and efficiency
-- Continuous improvement tracking (Kaizen) with estimated gains
+| Membre | Rôle |
+|--------|------|
+| Douae AIT TALEB | Développement Backend (Django REST API) |
+| Hajar MORGHI | Développement Frontend (Next.js) |
+| Zineb BELRHITI | Développement APIs & Coordination |
 
-### Time management
-- Interactive Gantt chart with editable task dates
-- Visual timeline with month grid and a today marker
+---
 
-### Cost management
-- Cost line entry (planned vs actual)
-- Variance (ecart) calculation per line and overall
-
-### Quality management
-- Non-conformity register with severity levels
-- Corrective action tracking
-- Quality indicators (resolution rate, open vs resolved)
-
-### Dashboard and KPIs
-The platform computes indicators automatically from project data: SPI, CPI, completion rate, and non-conformity rate.
-
-## Tech Stack
-
-### Frontend
-- Next.js 16 (App Router), React 19, TypeScript
-- Tailwind CSS v4 (CSS-first theming via @theme)
-- dnd-kit for the Kanban drag-and-drop
-- js-cookie for token handling
+## 🛠️ Technologies Utilisées
 
 ### Backend
-- Django 6 with Django REST Framework
-- SimpleJWT authentication (JWT access/refresh tokens)
-- SQLite database (development)
+- Python 3.14
+- Django 6.0
+- Django REST Framework
+- JWT (SimpleJWT)
+- SQLite
+- django-cors-headers
 
-## Project Structure
+### Frontend
+- Next.js
+- TypeScript
+- Tailwind CSS
 
-```
+---
+
+## 📁 Structure du Projet
 GPLeanAgile/
-  frontend/        Next.js app (app/, components/, lib/api.ts, public/)
-  backend/         Django project
-    gpleanagile/   settings and root URLs
-    account/       authentication (login, register, profile)
-    projects/      projects, tasks, costs, non-conformities
-    lean/          muda, kaizen, vsm
-  shared/          API contracts and KPI definitions
-  docs/            documentation
-```
+├── backend/
+│   ├── account/          # Authentification
+│   ├── projects/         # Gestion des projets
+│   ├── lean/             # Module Lean
+│   ├── agile/            # Module Agile
+│   ├── notifications/    # Notifications
+│   ├── gpleanagile/      # Configuration Django
+│   └── manage.py
+├── frontend/             # Application Next.js
+└── README.md
+---
 
-## Installation
+## 🚀 Installation et Lancement
 
-### Prerequisites
-- Node.js >= 18
-- Python >= 3.11
-- npm
+### Backend
 
-### Backend (Django)
-```
-bash
-cd backend
-python -m venv venv
-venv\Scripts\activate        # Windows
-source venv/bin/activate     # macOS / Linux
+```bash
+cd GPLeanAgile/backend
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
-The API runs at http://127.0.0.1:8000/
 
-### Frontend (Next.js)
-```
-bash
-cd frontend
+Le backend sera accessible sur : `http://localhost:8000`
+
+### Frontend
+
+```bash
+cd GPLeanAgile/frontend
 npm install
 npm run dev
 ```
-The app runs at http://localhost:3000/
 
-### Environment
-The frontend reads NEXT_PUBLIC_API_URL (defaults to http://localhost:8000/api). To override, create frontend/.env.local with NEXT_PUBLIC_API_URL=http://localhost:8000/api
+Le frontend sera accessible sur : `http://localhost:3000`
 
-Run the backend and frontend in two separate terminals.
+---
 
-## API Modules
+## 🔐 Authentification
 
-- Auth and users: /api/login/, /api/register/, /api/users/
-- Projects: /api/projects/ (per-project KPI at /api/projects/{id}/kpi/)
-- Tasks: /api/taches/
-- Costs: /api/couts/
-- Non-conformities: /api/non-conformites/
-- Lean: /api/mudas/, /api/kaizens/, /api/vsm-steps/
+JWT avec token d'accès **24 heures** et token de rafraîchissement **7 jours**.
 
-## Team
-Developed in the Supply Chain & Logistics program at ENSIAS.
+Header à utiliser : Authorization: Bearer <access_token>
+---
 
-## License
-For academic and educational use.
+## 📊 Fonctionnalités Principales
+
+- ✅ Authentification sécurisée JWT
+- ✅ Gestion CRUD des projets et tâches
+- ✅ Calcul automatique des KPI (SPI, CPI, taux d'avancement)
+- ✅ Module Lean : Muda, Kaizen, VSM
+- ✅ Module Agile : Sprints, Backlog, Burndown Chart
+- ✅ Système de notifications
+- ✅ Export des données projet
+- ✅ Interface d'administration
+
+---
+
+## 🎓 ENSIAS — Année Universitaire 2025/2026
